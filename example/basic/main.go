@@ -2,7 +2,11 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/swag/example/basic/api"
+	"github.com/linnv/swag/example/basic/api"
+	"github.com/linnv/swag/example/basic/docs"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 // @title Swagger Example API
@@ -20,10 +24,20 @@ import (
 // @host petstore.swagger.io
 // @BasePath /v2
 func main() {
+	// programatically set swagger info
+	docs.SwaggerInfo.Title = "Swagger Example API"
+	docs.SwaggerInfo.Description = "This is a sample server Petstore server."
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "petstore.swagger.io"
+	docs.SwaggerInfo.BasePath = "/v2"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
 	r := gin.New()
 	r.GET("/testapi/get-string-by-int/:some_id", api.GetStringByInt)
 	r.GET("//testapi/get-struct-array-by-string/:some_id", api.GetStructArrayByString)
 	r.POST("/testapi/upload", api.Upload)
+	// use ginSwagger middleware to serve the API docs
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run()
 
 }
